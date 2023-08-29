@@ -1,0 +1,71 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+}
+
+section {
+    padding: 2rem;
+}
+
+h1, h2, h3 {
+    color: white;
+}
+
+.project {
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Two columns layout */
+    gap: 20px;
+}
+
+.project img {
+    max-width: 100%;
+    height: auto;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+/* Adjustments for screens smaller than 768px */
+@media screen and (max-width: 768px) {
+    header nav ul {
+        text-align: center;
+    }
+
+    nav ul li {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .project {
+        grid-template-columns: 1fr; /* Single column layout */
+    }
+}
