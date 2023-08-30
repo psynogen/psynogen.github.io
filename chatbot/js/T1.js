@@ -92,12 +92,13 @@ var ctx2 = canvas2.getContext("2d");
 // set canvas dimensions
 var canvasH = window.innerHeight;
 var canvasW = (terminal.canvas.width * 2) * (window.innerWidth/window.innerHeight);
+//var canvasW = window.innerWidth
 ctx2.canvas.width = canvasW;
 ctx2.canvas.height = canvasH;
 ctx2.fillStyle = 'black';
 ctx2.rect(0, 0, window.innerWidth, window.innerHeight);
 ctx2.fill();
-ctx2.drawImage(terminal.canvas,0,0,terminal.canvas.width,400,0,0,canvasW,canvasH);
+drawToCanvas2();
 
 function loadFileAsText(file_browser) {
 	var fileToLoad = file_browser.files[0];
@@ -458,7 +459,9 @@ function drawToCanvas2() {
 }
 
 /**
- * From Web Tutorial
+ * From Web Tutorial Code Project
+ * https://www.codeproject.com/Articles/5350454/Chat-GPT-in-JavaScript
+ * Igor Krupitsky
  */
 
 var OPENAI_API_KEY = "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";
@@ -533,11 +536,13 @@ function Send(query) {
                 oJson = JSON.parse(oHttp.responseText);
             } catch (ex) {
                 fileContents += "Error: " + ex.message;
+				speak(fileContents);
 				terminal.print(fileContents);
             }
 
             if (oJson.error && oJson.error.message) {
                 fileContents += "Error: " + oJson.error.message;
+				speak(fileContents);
 				terminal.print(fileContents);
 				//alert(fileContents);
 
@@ -563,6 +568,7 @@ function Send(query) {
                     s = "No response";
                 } else {
                     fileContents += "Chat GPT: " + s;
+					speak(fileContents);
 					terminal.print(fileContents);
                     TextToSpeech(s);
                 }
