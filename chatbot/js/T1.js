@@ -416,9 +416,6 @@ function classTerminal() {
 			
 			if ((terminal.app == "jot") && (terminal.line.text.trim() != "")) fileContents = fileContents + terminal.line.text + "\n";
 			if ((terminal.app == "game") && (terminal.line.text.trim() != "")) system.parseInput();
-			Send(terminal.line.text);
-			
-			
 			if (print_buffer == true) terminal.text.printEnter();
 			terminal.line.text = "";
 		}

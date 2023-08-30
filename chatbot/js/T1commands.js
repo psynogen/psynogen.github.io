@@ -61,7 +61,9 @@ function T1commands(line) {
 			case "":
 				terminal.sound.beep([[500, 0.1]]);
 			default:
-				terminal.sound.beep([[500, 0.1]]);
+				Send(line); // SEND TO CHATGPT
+			
+			
 		}
 	}
 	else if (terminal.app == "jot") {
