@@ -461,7 +461,7 @@ function drawToCanvas2() {
  * Igor Krupitsky
  */
 
-var OPENAI_API_KEY = "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";
+var OPENAI_API_KEY = "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";
 var bTextToSpeechSupported = false;
 var bSpeechInProgress = false;
 var oSpeechRecognizer = null

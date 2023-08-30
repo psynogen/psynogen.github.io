@@ -60,9 +60,10 @@ function T1commands(line) {
 				break;
 			case "":
 				terminal.sound.beep([[500, 0.1]]);
+				break;
 			default:
 				Send(line); // SEND TO CHATGPT
-			
+				
 			
 		}
 	}
