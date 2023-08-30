@@ -63,23 +63,28 @@ function commands(line) {
 window.addEventListener("load", initTerminal, false);
 
 var settings = {
-	cols: 40, 
+	cols: 80, 
 	rows: 20,
 	line_height: 20,
 	padding_bottom: 10,
 	text_color: "#C0C0C0",
 	text_height: 20,
-	prompt_text: "c:\\>",
+	prompt_text: "]",
 	font: "12pt commodore",
 	cursor_top: 4,
 	cursor_width: 16, // 8
 	cursor_height: 18, // 3
-	prompt_color_random: true
+	prompt_color_random: true,
+	line_color: "white"
 }
 
 var print_buffer = true;
 var file_contents = "";
 var terminal = new classTerminal();
+terminal.canvas.style.position = "absolute";
+terminal.canvas.style.left = "0px";
+terminal.canvas.style.top = "0px";
+
 
 // SETUP CANVAS2
 var canvas2 = document.createElement('canvas');
@@ -91,7 +96,7 @@ document.body.append(canvas2);
 var ctx2 = canvas2.getContext("2d");
 // set canvas dimensions
 var canvasH = window.innerHeight;
-var canvasW = (terminal.canvas.width * 2) * (window.innerWidth/window.innerHeight);
+var canvasW = window.innerWidth;
 //var canvasW = window.innerWidth
 ctx2.canvas.width = canvasW;
 ctx2.canvas.height = canvasH;
@@ -182,8 +187,8 @@ function classTerminal() {
 	
 	this.print = function(text) {
 		if (typeof text === 'string' || text instanceof String) {
-			if ((print_buffer == "") || (print_buffer == true)) print_buffer = "\t";
-			print_buffer += "\n"+text;
+			if ((print_buffer == "") || (print_buffer == true)) print_buffer = "";
+			print_buffer += text;
 			setTimeout(terminal.print, 100);
 			return;
 		}
@@ -198,6 +203,7 @@ function classTerminal() {
 				terminal.text.printChar(output_char);
 			}
 			requestAnimationFrame(terminal.print);
+			drawToCanvas2();
 		}
 		else if (print_buffer.length == 0) {
 			print_buffer = false; // print_buffer false state = on_complete
@@ -208,6 +214,7 @@ function classTerminal() {
 			// print prompt when print_buffer is on_complete
 			terminal.text.printEnter(); 
 			terminal.screen.getNewPositionX(); // refresh x pos calculation
+			drawToCanvas2();
 		}	
 	}
 
@@ -218,11 +225,13 @@ function classTerminal() {
 			ctx.fillStyle = "#000000";
 			ctx.fillRect(0, ctx.canvas.height - terminal.line.height, ctx.canvas.width, ctx.canvas.height); // ERASE BOTTOM
 			ctx.fillRect(0, 0, ctx.canvas.width, 2);
+			drawToCanvas2();
 		}
 
 		this.clear = function() {
 			ctx.fillStyle = "#000000";
 			ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+			drawToCanvas2();
 		}
 		
 		this.getNewPositionX = function() {
@@ -263,6 +272,7 @@ function classTerminal() {
 				ctx.fillStyle = "green";
 				ctx.fillRect(terminal.cursor.x, terminal.cursor.y + terminal.cursor.top, terminal.cursor.width, terminal.cursor.height);
 			}
+			drawToCanvas2();
 		}
 
 		this.erase = function() {
@@ -270,6 +280,7 @@ function classTerminal() {
 				ctx.fillStyle = "#000000";
 				ctx.fillRect(terminal.cursor.x, terminal.cursor.y + terminal.cursor.top, terminal.cursor.width, terminal.cursor.height);
 			}
+			drawToCanvas2();
 		}
 
 		this.blink = function(){
@@ -310,14 +321,18 @@ function classTerminal() {
 			var character = String.fromCharCode(charCode);
 			terminal.line.text += character
 			ctx.font = terminal.font;
+			terminal.text.color = "white";
 			ctx.fillStyle = terminal.text.color;
 			ctx.fillText(character, terminal.cursor.x, terminal.cursor.y+terminal.line.height);
+			drawToCanvas2();
 		}
 		
 		this.print = function (outputChar) {
 			ctx.font = terminal.font;
+			terminal.text.color = settings.line_color;
 			ctx.fillStyle = terminal.text.color;
 			ctx.fillText(outputChar, terminal.cursor.x, terminal.cursor.y+terminal.line.height);
+			drawToCanvas2();
 		}
 		
 		this.printChar = function (output_char) {
@@ -325,6 +340,7 @@ function classTerminal() {
 			terminal.text.print(output_char);
 			terminal.screen.getNewPositionX();
 			terminal.cursor.draw();
+			drawToCanvas2();
 		}
 		
 		this.printEnter = function(draw_prompt=true) {
@@ -332,6 +348,7 @@ function classTerminal() {
 			terminal.line.row = 0;
 			terminal.screen.getNewPositionY(draw_prompt);
 			if (draw_prompt) terminal.prompt.draw(settings.prompt_color_random);
+			drawToCanvas2();
 		}
 		
 		this.erase = function() {
@@ -346,18 +363,23 @@ function classTerminal() {
 				}
 				ctx.fillStyle = "blue";
 				ctx.fillRect(terminal.cursor.x, terminal.cursor.y + terminal.cursor.top, this.width, terminal.line.height - terminal.cursor.top);
+				drawToCanvas2();
 			}
 		}
 	}
 	function classPrompt() {
 		this.width = "";
 		this.color = "#FFFFFF";
-		this.text = "c:\\>";
+		this.text = settings.prompt_text;
 		
 		this.draw = function(){
 			terminal.text.string = terminal.prompt.text;
 			ctx.font = terminal.font;
-			if (settings.prompt_color_random) this.color = getRandomColor();
+			if (settings.prompt_color_random) {
+				// this.color = getRandomColor();
+				//settings.line_color = this.color;
+				settings.line_color =  getRandomColor();
+			}
 			ctx.fillStyle = this.color;
 			ctx.fillText(terminal.text.string, 0 , terminal.cursor.y + terminal.line.height);
 		}
@@ -416,7 +438,7 @@ function classTerminal() {
 			
 			if ((terminal.app == "jot") && (terminal.line.text.trim() != "")) fileContents = fileContents + terminal.line.text + "\n";
 			if ((terminal.app == "game") && (terminal.line.text.trim() != "")) system.parseInput();
-			if (print_buffer == true) terminal.text.printEnter();
+			if (print_buffer == true) terminal.text.printEnter(false);
 			terminal.line.text = "";
 		}
 		
@@ -461,7 +483,7 @@ function drawToCanvas2() {
  * Igor Krupitsky
  */
 
-var OPENAI_API_KEY = "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";
+var OPENAI_API_KEY = "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";
 var bTextToSpeechSupported = false;
 var bSpeechInProgress = false;
 var oSpeechRecognizer = null
@@ -497,7 +519,7 @@ function ChangeLang(o) {
 
 function Send(query) {
 
-    var sQuestion = query;
+    var sQuestion = query + ". give answer in one sentence.";
     // if (sQuestion == "") {
         // alert("Type in your question!");
         // txtMsg.focus();
@@ -554,17 +576,21 @@ function Send(query) {
                     s = oJson.choices[0].message.content;
                 }
 
-                if (selLang.value != "en-US") {
-                    var a = s.split("?\n");
-                    if (a.length == 2) {
-                        s = a[1];
-                    }
-                }
+                // if (selLang.value != "en-US") {
+                    // var a = s.split("?\n");
+                    // if (a.length == 2) {
+                        // s = a[1];
+                    // }
+                // }
+				
+				// remove accessive \n
+				s = s.replace(/[\n\r]/g, '');
+				
 
                 if (s == "") {
                     s = "No response";
                 } else {
-                    fileContents += "Chat GPT: " + s;
+                    fileContents += s;
 					speak(fileContents);
 					terminal.print(fileContents);
                     TextToSpeech(s);
